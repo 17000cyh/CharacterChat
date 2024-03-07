@@ -8,7 +8,9 @@
 {{examples}}
 
 你实际写作的场景如下:
-[last_content]: {{last_content}}
+上一个场景的描写如下:
+[last_content]: 
+{{last_content}}
 本章节的大纲如下:
 [setting]: {{setting}}
 [plot]: {{plot}}
