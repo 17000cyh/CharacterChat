@@ -31,5 +31,3 @@
 [characters]: {{character_next}}
 
 当前章节的结果:
-
-

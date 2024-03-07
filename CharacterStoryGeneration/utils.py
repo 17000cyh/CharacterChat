@@ -3,15 +3,16 @@ import time
 import requests
 from openai import OpenAI
 
-client = OpenAI(api_key="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")
+# client = OpenAI(api_key="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")
 
+client = OpenAI(api_key="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")
 
 
 def send_request(query, model="gpt-4"):
   response = ""
 
   for i in range(0,10):
-    try:
+    # try:
       completion = client.chat.completions.create(
         model=model,
         messages=[
@@ -23,8 +24,8 @@ def send_request(query, model="gpt-4"):
       # print(completion.choices[0].message)
 
       return completion.choices[0].message.content
-    except:
-      print("sth wrong, skip")
+    # except:
+    #   print("sth wrong, skip")
       
       continue
   return response

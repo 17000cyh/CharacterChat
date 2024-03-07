@@ -16,7 +16,7 @@ def framework_insert_edit(
         critique_example=open("Prompts/场景内插批评Prompt example.txt").read(),
 ):
     print("开始进行情节修正")
-    for i in tqdm(range(10)):
+    for i in tqdm(range(5)):
         print("开始对当前的情节进行分析")
         critique_prompt = open("Prompts/场景内插批评Prompt.txt").read()
         critique_prompt = critique_prompt.replace("{{plot}}", original_framework["plot"])
@@ -144,7 +144,7 @@ def detail_plot(now_plot:dict, example=open("Prompts/场景细化Prompt  example
 
     return parser.parse_multi_plot(detail_str)
 
-def create_scene(now_plot:dict, example=open("Prompts/场景描写Prompt example.txt").read()):
+def create_scene(now_plot:dict, last_content="", example=open("Prompts/场景描写Prompt example.txt").read()):
     setting = now_plot["setting"]
     plot = now_plot["plot"]
     character = characters_dict_to_str(now_plot["characters_dict"])
@@ -153,6 +153,7 @@ def create_scene(now_plot:dict, example=open("Prompts/场景描写Prompt example
     create_prompt = create_prompt.replace("{{plot}}", plot)
     create_prompt = create_prompt.replace("{{character}}", character)
     create_prompt = create_prompt.replace("{{examples}}", example)
+    create_prompt = create_prompt.replace("{{last_content}}", last_content)
     create_str = send_request(create_prompt)
 
     print(f"-------------- create str is ---------------")
@@ -167,7 +168,7 @@ def create_scene(now_plot:dict, example=open("Prompts/场景描写Prompt example
 
 def generate_story_framework(
     seed_framework: [dict],
-    horizontal_expansion:int=3,
+    horizontal_expansion:int=1,
     vertical_expansion:int=1,
     result_json_file = open("plot_json.json","w"),
     result_txt_file = open("plot.txt","w")
@@ -210,15 +211,12 @@ def generate_story_framework(
     json.dump(vertical_framework_list, result_json_file
                , indent=4, ensure_ascii=False)
 
+    create_str = ""
     for i in range(len(vertical_framework_list[-1])):
-        create_str = create_scene(vertical_framework_list[-1][i])
+        create_str = create_scene(vertical_framework_list[-1][i], last_content=create_str)
         result_txt_file.write(create_str)
         result_txt_file.write(" - " * 20)
         result_txt_file.write("\n")
-
-
-
-
 
 
 if __name__ == "__main__":
