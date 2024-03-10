@@ -16,7 +16,7 @@ def framework_insert_edit(
         critique_example=open("Prompts/场景内插批评Prompt example.txt").read(),
 ):
     print("开始进行情节修正")
-    for i in tqdm(range(5)):
+    for i in tqdm(range(3)):
         print("开始对当前的情节进行分析")
         critique_prompt = open("Prompts/场景内插批评Prompt.txt").read()
         critique_prompt = critique_prompt.replace("{{plot}}", original_framework["plot"])
