@@ -1,4 +1,5 @@
 from utils import send_request, question_generate, insight_generate
+from tqdm import tqdm
 
 class Node:
     def __init__(self, node_type, node_id, level, content, children=None, parent=None):
@@ -27,11 +28,21 @@ def generate_insights(nodes, window_size, max_depth, current_level=1):
     output_list = []
 
     # Iterate through the nodes in windows to generate insights
-    for i in range(0, len(nodes), window_size):
+    for i in tqdm(range(0, len(nodes), window_size)):
         window_nodes = nodes[i:i+window_size]
         questions = question_generate(window_nodes)
-        insights = insight_generate(questions, materials)
-        
+        insights = insight_generate(questions, window_nodes)    
+        print("=" * 60)
+        print("questions for this winodw size is")
+        for i, question in enumerate(questions):
+            print(f"{i}. {question}")
+        print('-' * 60)
+        print("insights for this window size is")
+        for i, insight in enumerate(insights):
+            print(f"{i}. {insight}")
+        print("=" * 60)
+        print("\n\n")
+
         for insight_id, insight in enumerate(insights, start=1):
             new_node = Node('insight', f"{current_level}-{insight_id}", current_level, insight)
             for node in window_nodes:
@@ -42,16 +53,32 @@ def generate_insights(nodes, window_size, max_depth, current_level=1):
     return generate_insights(output_list, window_size, max_depth, current_level + 1)
 
 if __name__ == "__main__":
-    
+    import pickle
 
-    # Example usage with revised parameters
-    events = [Node('event', f"event{i}", 1, f"Event {i} content") for i in range(1, 7)]
-    root = generate_insights(events, 3, 3)  # window_size=3, max_depth=3
+    original_story = open("../data/original_story/plot_0.txt").read()
+
+    plots = original_story.split("-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ")
+
+    events = [Node('event', f"event{i}", 1, plot) for i,plot in enumerate(plots)]
+
+    print("initial events is ")
+    for event in events:
+        print(event)
+
+    events = events[0:2]
+    root = generate_insights(events, 3, 2)  # window_size=3, max_depth=3
 
     # Function to print the tree for visualization
-    def print_tree(node, level=0):
+    def print_and_serialize_tree(node, level=0, file_path="tree.pkl"):
         print("  " * level + str(node))
         for child in node.children:
-            print_tree(child, level + 1)
+            print_and_serialize_tree(child, level + 1)
+        
+        # Only serialize at the root level to avoid multiple serializations
+        if level == 0:
+            with open(file_path, "wb") as file:
+                pickle.dump(node, file)
+            print(f"Tree has been serialized and saved to '{file_path}'.")
 
-    print_tree(root)
+    print_and_serialize_tree(root,file_path="../data/reflection_result/plot_0.pkl")
+

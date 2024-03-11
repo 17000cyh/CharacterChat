@@ -2,10 +2,11 @@ import time
 # from qwen_utils import send_request
 import requests
 from openai import OpenAI
+from tqdm import tqdm
 
 # client = OpenAI(api_key="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")
 
-client = OpenAI(api_key="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")
+client = OpenAI(api_key="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")
 
 
 def send_request(query, model="gpt-3.5-turbo"):
@@ -49,12 +50,13 @@ def question_generate(nodes):
     # 解析大模型的输出并返回
     # 假设response的格式是"1. Question1 2. Question2"，我们需要解析这个格式
     questions = response.split('\n')[1:]  # 移除首行，然后每个问题是一行
-    print(f"questions is {questions}")
     return questions
 
-def insight_generate(questions, materials):
+def insight_generate(questions, nodes):
     insights = []
-    for question in questions:
+    materials = [node.content for node in nodes]
+    materials = "\n".join(materials)
+    for question in tqdm(questions):
         prompt = open("prompts/reflection_insight_generation.txt").read()
         prompt = prompt.replace("{{question}}", question)
         prompt = prompt.replace("{{materials}", materials)
