@@ -30,7 +30,7 @@ def generate_insights(nodes, window_size, max_depth, current_level=1):
     for i in range(0, len(nodes), window_size):
         window_nodes = nodes[i:i+window_size]
         questions = question_generate(window_nodes)
-        insights = insight_generate(questions)
+        insights = insight_generate(questions, materials)
         
         for insight_id, insight in enumerate(insights, start=1):
             new_node = Node('insight', f"{current_level}-{insight_id}", current_level, insight)

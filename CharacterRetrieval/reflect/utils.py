@@ -31,7 +31,6 @@ def send_request(query, model="gpt-3.5-turbo"):
   return response
 
 
-
 def characters_dict_to_str(characters_dict):
     characters_str = ""
     for name, description in characters_dict.items():
@@ -53,9 +52,19 @@ def question_generate(nodes):
     print(f"questions is {questions}")
     return questions
 
-def insight_generate(questions):
-    # Updated to use questions for insight generation
-    insights = [f"Insight based on question: {question}" for question in questions]
+def insight_generate(questions, materials):
+    insights = []
+    for question in questions:
+        prompt = open("prompts/reflection_insight_generation.txt").read()
+        prompt = prompt.replace("{{question}}", question)
+        prompt = prompt.replace("{{materials}", materials)
+        
+        # 调用send_request与大模型交互，生成洞察
+        response = send_request(prompt)
+        
+        # 将生成的洞察加入到insights列表
+        insights.append(response)
+
     return insights
 
 if __name__ == "__main__":
