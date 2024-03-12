@@ -52,33 +52,44 @@ def generate_insights(nodes, window_size, max_depth, current_level=1):
     # Recursively process the next level of insights
     return generate_insights(output_list, window_size, max_depth, current_level + 1)
 
-if __name__ == "__main__":
-    import pickle
+def print_and_serialize_tree(node, level=0, file_path="tree.pkl"):
+    print("  " * level + str(node))
+    for child in node.children:
+        print_and_serialize_tree(child, level + 1)
+    
+    # 只在根级别序列化以避免多次序列化
+    if level == 0:
+        with open(file_path, "wb") as file:
+            pickle.dump(node, file)
+        print(f"Tree has been serialized and saved to '{file_path}'.")
 
-    original_story = open("../data/original_story/plot_0.txt").read()
+
+def process_story(plot_number):
+    file_path = f"../data/original_story/plot_{plot_number}.txt"
+    original_story = open(file_path).read()
 
     plots = original_story.split("-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ")
 
-    events = [Node('event', f"event{i}", 1, plot) for i,plot in enumerate(plots)]
+    events = [Node('event', f"event{i}", 1, plot) for i, plot in enumerate(plots)]
 
-    print("initial events is ")
+    print("initial events are:")
     for event in events:
         print(event)
+    
+    root = generate_insights(events, 3, 2)  # window_size=3, max_depth=2
 
-    events = events[0:2]
-    root = generate_insights(events, 3, 2)  # window_size=3, max_depth=3
+    print_and_serialize_tree(root, file_path=f"../data/reflection_result/plot_{plot_number}.pkl")
 
-    # Function to print the tree for visualization
-    def print_and_serialize_tree(node, level=0, file_path="tree.pkl"):
-        print("  " * level + str(node))
-        for child in node.children:
-            print_and_serialize_tree(child, level + 1)
-        
-        # Only serialize at the root level to avoid multiple serializations
-        if level == 0:
-            with open(file_path, "wb") as file:
-                pickle.dump(node, file)
-            print(f"Tree has been serialized and saved to '{file_path}'.")
 
-    print_and_serialize_tree(root,file_path="../data/reflection_result/plot_0.pkl")
+if __name__ == "__main__":
+    import pickle
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Process a story plot.")
+    parser.add_argument("--plot_number", type=int, help="The number of the plot to process")
+    
+    args = parser.parse_args()
+    
+    process_story(args.plot_number)
+
 

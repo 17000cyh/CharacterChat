@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 # client = OpenAI(api_key="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")
 
-client = OpenAI(api_key="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")
+client = OpenAI(api_key="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")
 
 
 def send_request(query, model="gpt-3.5-turbo"):
