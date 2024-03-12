@@ -24,12 +24,28 @@ def build_questions_dict_from_tree(file_path="tree.pkl"):
 
     return node_questions_dict
 
+def serialize_questions_dict(plot_number):
+    # 生成树文件路径和问题文件路径
+    tree_file_path = f"../data/reflection_result/plot_{plot_number}.pkl"
+    question_file_path = f"../data/reflection_result/plot_{plot_number}_question.pkl"
+
+    # 从树文件构建问题字典
+    node_questions_dict = build_questions_dict_from_tree(tree_file_path)
+    
+    # 序列化问题字典到文件
+    with open(question_file_path, "wb") as file:
+        pickle.dump(node_questions_dict, file)
+    print(f"Questions dictionary has been serialized and saved to '{question_file_path}'.")
+
+
 if __name__ == "__main__":
     import pickle
     from tqdm import tqdm
+    import argparse
 
-    node_questions_dict = build_questions_dict_from_tree("../data/reflection_result/plot_0.pkl")
+    parser = argparse.ArgumentParser(description="Serialize questions dictionary from a story plot tree.")
+    parser.add_argument("plot_number", type=int, help="The number of the plot to process")
     
-    with open("../data/reflection_result/plot_0_question.pkl","wb") as file:
-        pickle.dump(node_questions_dict, file)
+    args = parser.parse_args()
     
+    serialize_questions_dict(args.plot_number)
