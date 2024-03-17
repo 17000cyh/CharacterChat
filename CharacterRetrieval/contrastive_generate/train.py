@@ -15,29 +15,54 @@ import torch.nn.functional as F
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # 数据和模型初始化
-tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
-plot_pkl_path = "../data/reflection_result/plot_0.pkl"
-question_pkl_path = "../data/reflection_result/plot_0_question.pkl"
-data_dict = data_align(plot_pkl_path, question_pkl_path)
+tokenizer = RobertaTokenizer.from_pretrained('roberta')
+
+question_id_list = [0,1,2,3,4,5,8,9]
+
+test_question_id_list = [10,11]
+
+data_dict = {}
+for question_id in question_id_list:
+    plot_pkl_path = f"../data/reflection_result/plot_{question_id}.pkl"
+    question_pkl_path = f"../data/reflection_result/plot_{question_id}_question.pkl"
+    
+    temp_dict = data_align(plot_pkl_path, question_pkl_path)
+    data_dict.update(temp_dict)
+
 dataset = QueryMaterialDataset(data_dict, tokenizer)
 
 # 分割数据集为训练集和测试集
 train_size = int(0.9 * len(dataset))
 test_size = len(dataset) - train_size
 train_dataset, valid_dataset = random_split(dataset, [train_size, test_size])
+
+# 构建测试数据集
+data_dict = {}
+for question_id in test_question_id_list:
+    plot_pkl_path = f"../data/reflection_result/plot_{question_id}.pkl"
+    question_pkl_path = f"../data/reflection_result/plot_{question_id}_question.pkl"
+    
+    temp_dict = data_align(plot_pkl_path, question_pkl_path)
+    data_dict.update(temp_dict)
 test_dataset = QueryMaterialDataset(data_dict, tokenizer)
 
-train_loader = DataLoader(train_dataset, batch_size=2, shuffle=True, collate_fn=contrastive_collate_fn_with_multiple_negatives)
-valid_loader = DataLoader(valid_dataset, batch_size=2, shuffle=False, collate_fn=contrastive_collate_fn_with_multiple_negatives,drop_last=True)
-test_loader = DataLoader(test_dataset, batch_size=2, shuffle=False, collate_fn=contrastive_collate_fn_with_multiple_negatives, drop_last=True)
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, collate_fn=contrastive_collate_fn_with_multiple_negatives)
+valid_loader = DataLoader(valid_dataset, batch_size=32, shuffle=False, collate_fn=contrastive_collate_fn_with_multiple_negatives,drop_last=True)
+test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False, collate_fn=contrastive_collate_fn_with_multiple_negatives, drop_last=True)
+
+print("Data and model initialized")
+# 打印数据集长度信息
+print(f"Train Dataset: {len(train_dataset)}")
+print(f"Valid Dataset: {len(valid_dataset)}")
+print(f"Test Dataset: {len(test_dataset)}")
 
 model = ContrastiveLearningModel().to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-5)
 
 # 训练过程
-num_epochs = 1
+num_epochs = 100
 best_loss = np.inf
-patience, trials = 3, 0
+patience, trials = 10, 0
 
 print("begin to train ...")
 
@@ -65,48 +90,48 @@ def evaluate(model, dataloader, device):
     return avg_loss
 
 
-# for epoch in range(num_epochs):
-#     model.train()
-#     total_loss = 0
-#     for batch in tqdm(train_loader, desc=f"Training Epoch {epoch+1}"):
-#         queries, positives, negatives_batch = batch
-#         # 处理queries和positives
-#         queries_input_ids, queries_attention_mask = queries['input_ids'].squeeze(1).to(device), queries['attention_mask'].squeeze(1).to(device)
-#         positives_input_ids, positives_attention_mask = positives['input_ids'].squeeze(1).to(device), positives['attention_mask'].squeeze(1).to(device)
+for epoch in range(num_epochs):
+    model.train()
+    total_loss = 0
+    for batch in tqdm(train_loader, desc=f"Training Epoch {epoch+1}"):
+        queries, positives, negatives_batch = batch
+        # 处理queries和positives
+        queries_input_ids, queries_attention_mask = queries['input_ids'].squeeze(1).to(device), queries['attention_mask'].squeeze(1).to(device)
+        positives_input_ids, positives_attention_mask = positives['input_ids'].squeeze(1).to(device), positives['attention_mask'].squeeze(1).to(device)
         
-#         optimizer.zero_grad()
-#         query_features = model(queries_input_ids, queries_attention_mask)
-#         positive_features = model(positives_input_ids, positives_attention_mask)
+        optimizer.zero_grad()
+        query_features = model(queries_input_ids, queries_attention_mask)
+        positive_features = model(positives_input_ids, positives_attention_mask)
         
-#         # 处理负例
-#         negative_features = []
-#         for negatives in negatives_batch:
-#             neg_input_ids, neg_attention_mask = negatives['input_ids'].squeeze(1).to(device), negatives['attention_mask'].squeeze(1).to(device)
-#             neg_features = model(neg_input_ids, neg_attention_mask)
-#             negative_features.append(neg_features)
+        # 处理负例
+        negative_features = []
+        for negatives in negatives_batch:
+            neg_input_ids, neg_attention_mask = negatives['input_ids'].squeeze(1).to(device), negatives['attention_mask'].squeeze(1).to(device)
+            neg_features = model(neg_input_ids, neg_attention_mask)
+            negative_features.append(neg_features)
         
-#         loss = info_nce_loss(query_features, positive_features, negative_features)
-#         loss.backward()
-#         optimizer.step()
-#         total_loss += loss.item()
+        loss = info_nce_loss(query_features, positive_features, negative_features)
+        loss.backward()
+        optimizer.step()
+        total_loss += loss.item()
     
-#     avg_loss = total_loss / len(train_loader)
-#     print(f"Epoch {epoch+1}, Avg Loss: {avg_loss:.4f}")
+    avg_loss = total_loss / len(train_loader)
+    print(f"Epoch {epoch+1}, Avg Loss: {avg_loss:.4f}")
     
-#     # 开始在验证集上进行测试
-#     val_loss = evaluate(model, valid_loader, device)
-#     print(f"Validation Loss: {val_loss:.4f}")
+    # 开始在验证集上进行测试
+    val_loss = evaluate(model, valid_loader, device)
+    print(f"Validation Loss: {val_loss:.4f}")
 
-#     # 开始进行早停机制
-#     if val_loss < best_loss:
-#         trials = 0
-#         best_loss = val_loss
-#         torch.save(model.state_dict(), "best_model.pth")
-#     else:
-#         trials += 1
-#         if trials >= patience:
-#             print("Early stopping")
-#             break
+    # 开始进行早停机制
+    if val_loss < best_loss:
+        trials = 0
+        best_loss = val_loss
+        torch.save(model.state_dict(), "best_model.pth")
+    else:
+        trials += 1
+        if trials >= patience:
+            print("Early stopping")
+            break
 
 
 

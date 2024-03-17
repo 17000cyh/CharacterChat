@@ -4,7 +4,7 @@ import torch.nn.functional as F
 import torch.nn as nn
 
 class ContrastiveLearningModel(nn.Module):
-    def __init__(self, pretrained_model_name='roberta-base'):
+    def __init__(self, pretrained_model_name='roberta'):
         super(ContrastiveLearningModel, self).__init__()
         self.encoder = RobertaModel.from_pretrained(pretrained_model_name)
         

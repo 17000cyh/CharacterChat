@@ -48,9 +48,13 @@ def data_align(plot_pkl_path, questoin_pkl_path):
     for key in question_dict.keys():
         questions = question_dict[key]
         for question in questions:
-            if len(node_id_context_dict[key]) < 30:
+            try:
+                if len(node_id_context_dict[key]) < 30:
+                    continue
+            except:
                 continue
             question = re.sub(r"^\d+\.\s?", "", question)
             query_material_pair_dict[question] = node_id_context_dict[key]
 
+    print(f"5 Examples of query_material_pair_dict: {list(query_material_pair_dict.items())[:5]}")
     return query_material_pair_dict
