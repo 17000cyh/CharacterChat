@@ -1,1 +1,1 @@
-from utils import search_material, load_embeddings
+from .utils import search_material, load_embeddings

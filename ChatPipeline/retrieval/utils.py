@@ -11,7 +11,7 @@ import numpy as np
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class ContrastiveLearningModel(nn.Module):
-    def __init__(self, pretrained_model_name='roberta'):
+    def __init__(self, pretrained_model_name='retrieval/roberta'):
         super(ContrastiveLearningModel, self).__init__()
         self.encoder = RobertaModel.from_pretrained(pretrained_model_name)
         
@@ -22,22 +22,25 @@ class ContrastiveLearningModel(nn.Module):
 
 
 # 数据和模型初始化
-tokenizer = RobertaTokenizer.from_pretrained('roberta')
+tokenizer = RobertaTokenizer.from_pretrained('retrieval/roberta')
 
 model = ContrastiveLearningModel().to(device)
 
 model.load_state_dict(
-    torch.load("best_model.pth")
+    torch.load("retrieval/best_model.pth")
 )
 model.eval()
 
-def load_embeddings(material_list, model, tokenizer):
+def load_embeddings(material_list, model=model, tokenizer=tokenizer):
     # 加载所有材料的嵌入
     material_embeddings = {}
     for material in tqdm(material_list):
-        input_ids = tokenizer(material, return_tensors="pt")['input_ids'].to(device)
-        attention_mask = tokenizer(material, return_tensors="pt")['attention_mask'].to(device)
+        input_ids = tokenizer(material, return_tensors="pt")['input_ids'][:,:500].to(device) # 进行截断处理
+        attention_mask = tokenizer(material, return_tensors="pt")['attention_mask'][:,:500].to(device)
         with torch.no_grad():
+            # print(f"material: {material}")
+            # print(f"shape of input_ids: {input_ids.shape}")
+            # print(f"shape of attention_mask: {attention_mask.shape}")
             material_embeddings[material] = model(input_ids, attention_mask=attention_mask).cpu().squeeze().numpy()
     return material_embeddings
 

@@ -16,6 +16,6 @@
 {{examples}}
 
 输入:
-{{input}}
+{{query}}
 
 输出:
