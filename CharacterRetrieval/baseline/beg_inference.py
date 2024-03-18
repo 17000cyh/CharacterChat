@@ -8,7 +8,7 @@ import numpy as np
 from tqdm import tqdm
 
 # 下载模型并初始化SentenceTransformer
-model_dir = snapshot_download("AI-ModelScope/bge-large-zh-v1.5", revision='master')
+model_dir = snapshot_download("AI-ModelScope/bge-small-zh-v1.5", revision='master')
 model = SentenceTransformer(model_dir)
 
 def encode_sentences(sentences, normalize=True):
@@ -75,7 +75,7 @@ def calculate_mrr(ranked_lists):
 
 if __name__ == "__main__":
     data_dict = {}
-    plot_pkl_id_list = [10, 11]
+    plot_pkl_id_list = [0, 1]
     for plot_pkl_id in plot_pkl_id_list:
         plot_pkl_path = f"../data/reflection_result/plot_{plot_pkl_id}.pkl"
         question_pkl_path = f"../data/reflection_result/plot_{plot_pkl_id}_question.pkl"

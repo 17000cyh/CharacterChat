@@ -73,8 +73,6 @@ def search_material(query, material_embeddings, topk=5):
 
 
 
-
-
 if __name__ == "__main__":
     material_list = [
         "The cat is on the mat",

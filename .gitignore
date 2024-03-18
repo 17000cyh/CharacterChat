@@ -1,3 +1,6 @@
 CharacterRetrieval/contrastive_generate/roberta
 CharacterRetrieval/contrastive_generate/best_model.pth
 CharacterRetrieval/contrastive_generate/train.log
+ChatPipeline/retrieval/roberta
+ChatPipeline/retrieval/best_model.pth
+
