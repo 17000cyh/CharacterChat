@@ -74,10 +74,13 @@ def calculate_mrr(ranked_lists):
 
 
 if __name__ == "__main__":
-    plot_pkl_path = "../data/reflection_result/plot_0.pkl"
-    question_pkl_path = "../data/reflection_result/plot_0_question.pkl"
-    data_dict = generate_inference_dict(data_align(plot_pkl_path, question_pkl_path))
-
+    data_dict = {}
+    plot_pkl_id_list = [10, 11]
+    for plot_pkl_id in plot_pkl_id_list:
+        plot_pkl_path = f"../data/reflection_result/plot_{plot_pkl_id}.pkl"
+        question_pkl_path = f"../data/reflection_result/plot_{plot_pkl_id}_question.pkl"
+        data_dict.update(data_align(plot_pkl_path, question_pkl_path))
+        
     ranked_lists = evaluate_model(data_dict)
     hit_at_k = calculate_hit_at_k(ranked_lists, k=1)
     mrr = calculate_mrr(ranked_lists)
