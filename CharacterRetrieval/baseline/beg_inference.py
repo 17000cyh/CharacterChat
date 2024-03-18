@@ -80,7 +80,7 @@ if __name__ == "__main__":
         plot_pkl_path = f"../data/reflection_result/plot_{plot_pkl_id}.pkl"
         question_pkl_path = f"../data/reflection_result/plot_{plot_pkl_id}_question.pkl"
         data_dict.update(data_align(plot_pkl_path, question_pkl_path))
-        
+    data_dict = generate_inference_dict(data_dict)
     ranked_lists = evaluate_model(data_dict)
     hit_at_k = calculate_hit_at_k(ranked_lists, k=1)
     mrr = calculate_mrr(ranked_lists)
