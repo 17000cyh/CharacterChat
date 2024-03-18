@@ -15,6 +15,7 @@
 例子:
 {{examples}}
 
+注意，在输出Action的时候，你必须输出SearchQA、Response以及Response三种行为中的一种，并且使用[]给出对应工具的input。
 输入:
 {{query}}
 

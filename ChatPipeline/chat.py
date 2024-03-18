@@ -2,7 +2,7 @@ from retrieval import search_material, load_embeddings
 from utils import send_request
 import re
 import copy 
-
+from tqdm import tqdm
 
 planner_prompt_template = open("prompts/planner_prompt.txt").read()
 searchqa_prompt_template = open("prompts/searchqa_prompt.txt").read()
@@ -57,13 +57,14 @@ def chat_pipeline(knoledge_embeddings, query, prompt_template_dict, topk=5):
         print("searchqa_response: ", content)
 
     
-    style_transfer_query = style_transfer_template.replace("{{query}}", content)
+    style_transfer_query = style_transfer_prompt.replace("{{query}}", content)
     print("style_transfer_query: ", style_transfer_query)
     stylized_content = send_request(style_transfer_query)
 
     print("stylized_content: ", stylized_content)
     
     return {
+        "query": query,
         "planner_response": planner_response,
         "searchqa_response": searchqa_response,
         "stylized_content": stylized_content,
@@ -71,19 +72,31 @@ def chat_pipeline(knoledge_embeddings, query, prompt_template_dict, topk=5):
     }
 
 
+def deal_one_conversation_list(knoledge_embeddings, conversation_list, prompt_template_dict, jsonl_file):
+    conversation_result = []
+    for query in tqdm(conversation_list):
+        try:
+            result = chat_pipeline(knoledge_embeddings, query, prompt_template_dict)
+            jsonl_file.write(json.dumps(result, ensure_ascii=False) + "\n")
+        except:
+            print(f"error in query: {query}")
+            continue
 
 
 
 if __name__ == "__main__":
     import json
+    import os
 
     knoledge_embeddings = load_embeddings(
         json.load(open("data/plot_data/plot_0.json")),
     )
-    query = " 你这辈子干过的最重要的事情是什么？"
+    query_list = open("data/test_data/plot_0.txt").readlines()
     prompt_template_dict =  json.load(open("data/prompt_template_variable/plot_0_dict_template.json"))
-    chat_pipeline(knoledge_embeddings, query, prompt_template_dict)
-
+    
+    os.makedirs("results_chat", exist_ok=True)
+    jsonl_file = open("results_chat/plot_qwen14b_0.jsonl", "w")
+    deal_one_conversation_list(knoledge_embeddings, query_list, prompt_template_dict, jsonl_file)
 
 
 

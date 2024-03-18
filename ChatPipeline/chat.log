@@ -1,0 +1,7 @@
+nohup: 忽略输入
+2024-03-18 19:06:30,439 - modelscope - INFO - PyTorch version 2.0.0 Found.
+2024-03-18 19:06:30,440 - modelscope - INFO - Loading ast index from /home/cyh/.cache/modelscope/ast_indexer
+2024-03-18 19:06:30,562 - modelscope - INFO - Loading done! Current index file version is 1.10.0, with md5 38debac2a7a598032d9a009679010fff and a total number of 946 components indexed
+CUDA extension not installed.
+CUDA extension not installed.
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]

@@ -2,10 +2,10 @@ from modelscope import AutoModelForCausalLM, AutoTokenizer
 device = "cuda" # the device to load the model onto
 
 model = AutoModelForCausalLM.from_pretrained(
-    "qwen/Qwen1.5-72B-Chat-GPTQ-Int4",
+    "qwen/Qwen1.5-14B-Chat-GPTQ-Int4",
     device_map="auto"
 )
-tokenizer = AutoTokenizer.from_pretrained("qwen/Qwen1.5-72B-Chat-GPTQ-Int4")
+tokenizer = AutoTokenizer.from_pretrained("qwen/Qwen1.5-14B-Chat-GPTQ-Int4")
 
 def send_request(query):
     messages = [
