@@ -89,13 +89,13 @@ if __name__ == "__main__":
     import os
 
     knoledge_embeddings = load_embeddings(
-        json.load(open("data/plot_data/plot_0.json")),
+        json.load(open("data/plot_data/plot_1.json")),
     )
-    query_list = open("data/test_data/plot_0.txt").readlines()
-    prompt_template_dict =  json.load(open("data/prompt_template_variable/plot_0_dict_template.json"))
+    query_list = open("data/test_data/plot_1.txt").readlines()
+    prompt_template_dict =  json.load(open("data/prompt_template_variable/plot_1_dict_template.json"))
     
     os.makedirs("results_chat", exist_ok=True)
-    jsonl_file = open("results_chat/plot_qwen14b_0.jsonl", "w")
+    jsonl_file = open("results_chat/plot_qwen72b_1.jsonl", "w")
     deal_one_conversation_list(knoledge_embeddings, query_list, prompt_template_dict, jsonl_file)
 
 
