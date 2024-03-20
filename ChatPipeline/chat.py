@@ -97,7 +97,7 @@ if __name__ == "__main__":
     os.makedirs("results_chat", exist_ok=True)
     jsonl_file = open("results_chat/plot_qwen72b_1.jsonl", "w")
     deal_one_conversation_list(knoledge_embeddings, query_list, prompt_template_dict, jsonl_file)
-
+    
 
 
 

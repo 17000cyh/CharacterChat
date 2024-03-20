@@ -8,9 +8,9 @@
     c. 拒绝回答: {{knowledge_boundary_definition}}
 2. Plan: 对接下来的行动进行规划。
 3. Action: 根据Think和Plan的结果采取行动。你有三个工具:
-    a. SearchQA[input]：{{SearchQA_tool_description}}
-    b. Response[input]:{{Response_tool_description}}
-    c. Refuse[input]:{{Refuse_tool_description}}
+    a. SearchQA[input]: {{SearchQA_tool_description}}
+    b. Response[input]: {{Response_tool_description}}
+    c. Refuse[input]: {{Refuse_tool_description}}
 
 例子:
 {{examples}}
